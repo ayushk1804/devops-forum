@@ -1,7 +1,9 @@
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useReducer, useEffect } from "react";
+import createPersistedState from "use-persisted-state";
 
 const AuthDispatchContext = createContext();
 const AuthStateContext = createContext();
+const usePersistedAuthState = createPersistedState("forum-auth");
 
 const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 const LOGOUT = "LOGOUT";
@@ -14,7 +16,6 @@ const initialState = {
 
 function reducer(state, { payload, type }) {
   switch (type) {
-    
     case LOGIN_SUCCESS:
       return {
         ...state,
@@ -30,28 +31,52 @@ function reducer(state, { payload, type }) {
   }
 }
 
-const login = async ({ user, password }) => {
-  const token = "abc123";
-  const user = { name: "Test" };
-
-  dispatch({ type: LOGIN_SUCCESS, payload: { token, user } });
-};
-
-const createUser = async ({ name, user, password }) => {
-  const token = "abc123";
-  const user = { name: "Test" };
-
-  dispatch({ type: LOGIN_SUCCESS, payload: { token, user } });
-};
-
-const logout = async () => {
-  dispatch({ type: LOGOUT });
-};
-
 function AuthProvider({ children }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [savedAuthState, saveAuthState] = usePersistedAuthState(
+    JSON.stringify(initialState)
+  );
+
+  const [state, dispatch] = useReducer(reducer, JSON.parse(savedAuthState));
+
+  useEffect(() => {
+    saveAuthState(JSON.stringify(state));
+  }, [state, saveAuthState]);
+
+  const login = async ({ email, password }) => {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json?.message);
+    const { token, ...user } = json;
+    dispatch({ type: LOGIN_SUCCESS, payload: { token, user } });
+  };
+
+  const register = async ({ name, email, password }) => {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      body: JSON.stringify({ name, email, password }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json?.message);
+    const { token, ...user } = json;
+
+    dispatch({ type: LOGIN_SUCCESS, payload: { token, user } });
+  };
+
+  const logout = async () => {
+    dispatch({ type: LOGOUT });
+  };
+
   return (
-    <AuthDispatchContext.Provider value={{ login, logout, createUser }}>
+    <AuthDispatchContext.Provider value={{ login, register, logout }}>
       <AuthStateContext.Provider value={state}>
         {children}
       </AuthStateContext.Provider>
