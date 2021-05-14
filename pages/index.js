@@ -1,9 +1,10 @@
 import Head from "next/head";
+import Link from 'next/link'
 import { useAuthDispatch, useAuthState } from "../src/Context/auth";
 
 export default function IndexPage() {
   const { isAuthenticated, user } = useAuthState();
-  const { login, register, logout } = useAuthDispatch();
+  const { logout } = useAuthDispatch();
   return isAuthenticated ? (
     <>
       <p>{`Hello ${user.name}`}</p>
@@ -11,25 +12,8 @@ export default function IndexPage() {
     </>
   ) : (
     <>
-      <button
-        onClick={() => {
-          login({ email: "testuser111@test.com", password: "abc123" });
-        }}
-      >
-        LogIn
-      </button>
-      <br/>
-      <button
-        onClick={() =>
-          register({
-            name: "Test user 1",
-            email: "testuser111@test.com",
-            password: "abc123",
-          })
-        }
-      >
-        Register
-      </button>
+      <Link href="/auth/login">Login</Link>
+      <Link href="/auth/register">Register</Link>
     </>
   );
 }
