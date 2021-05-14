@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { Layout } from "../../src/Components/Layout/Layout";
 import { useAuthDispatch, useAuthState } from "../../src/Context/auth";
 
 export default function RegistrationPage() {
@@ -72,11 +73,16 @@ export default function RegistrationPage() {
           />
           {errors.password && <span>{errors.password.message}</span>}
         </div>
-        <button type="submit" disabled={isSubmitting}> Create Account </button>
+        <button type="submit" disabled={isSubmitting}>
+          {" "}
+          Create Account{" "}
+        </button>
       </form>
     </>
   );
 }
+
+RegistrationPage.layout = Layout;
 
 // 2. Post request to API /api/auth/register
 // 3. If error return the error

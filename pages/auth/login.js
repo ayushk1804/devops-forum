@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { Layout } from "../../src/Components/Layout/Layout";
 import { useAuthDispatch, useAuthState } from "../../src/Context/auth";
 
 export default function LoginPage() {
@@ -67,6 +68,7 @@ export default function LoginPage() {
     </>
   );
 }
+LoginPage.layout = Layout
 
 // 2. Post request to API /api/auth/register
 // 3. If error return the error
