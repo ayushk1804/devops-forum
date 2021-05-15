@@ -1,3 +1,5 @@
+import { useRouter } from "next/router";
+
 import { useForm } from "react-hook-form";
 import { Layout } from "../src/Components/Layout/Layout";
 import { hasuraAdminClient } from "../src/lib/hasura-admin-client";
@@ -26,6 +28,20 @@ const InsertThread = gql`
       }
     ) {
       id
+      updated_at
+      title
+      posts {
+        message
+        created_at
+        thread {
+          category {
+            name
+          }
+          author {
+            name
+          }
+        }
+      }
     }
   }
 `;
@@ -36,6 +52,7 @@ const AskPage = ({ categories }) => {
     register,
     formState: { isSubmitting, errors },
   } = useForm();
+  const router = useRouter();
 
   const onSubmit = async ({ categoryId, postTitle, postMessage }) => {
     console.log("posting");
@@ -47,6 +64,7 @@ const AskPage = ({ categories }) => {
         postMessage,
       });
       console.log(insert_threads_one);
+      router.push(`/threads/${insert_threads_one.id}`);
     } catch (err) {
       console.log(err);
     }
