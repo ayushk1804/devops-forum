@@ -10,8 +10,9 @@ const Layout = ({ children }) => {
         <div className="max-4-wl mx-auto px-6">
           {isAuthenticated ? (
             <>
-              <p>{`Hello ${user.name}`}</p>
+              <h1>{`Hello ${user.name}`}</h1>
               <button onClick={() => logout()}>{"LogOut"}</button>
+              <Link href="/ask">Ask a question</Link>
             </>
           ) : (
             <>
