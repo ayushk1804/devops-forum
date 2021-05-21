@@ -3,7 +3,7 @@ import { GraphQLClient, gql } from "graphql-request";
 const hasuraUserClient = () => {
   let token;
   if (typeof window !== "undefined") {
-    const user = JSON.parse(JSON.parse(localStorage.getItem("forum-auth")));
+    const user = JSON.parse(localStorage.getItem("forum-auth"));
     token = user?.token;
   }
 
