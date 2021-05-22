@@ -49,7 +49,7 @@ export default function RegistrationPage() {
           />
           {errors.name && <span>{errors.name.message}</span>}
           <input
-            type="text"
+            type="email"
             {...register("email", {
               required: "Please provide an email address",
               pattern: {

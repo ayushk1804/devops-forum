@@ -10,7 +10,7 @@ const Thread = ({ thread }) => {
   });
   const hasReplies = count > 1;
   return (
-    <div key={thread.id} className="p-6 flex space-x-3 place-items-center">
+    <div className="p-6 flex space-x-3 place-items-center">
       <div>
         <span className="inline-block h-8 w-8 rounded-full overflow-hidden bg-gray-200">
           <svg

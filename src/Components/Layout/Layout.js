@@ -8,6 +8,9 @@ const Layout = ({ children }) => {
     <>
       <header className="bg-white py-6 shadow-sm">
         <div className="max-w-4xl mx-auto px-6">
+          <Link href="/">
+            <a>Home</a>
+          </Link>
           {isAuthenticated ? (
             <>
               <h1>{`Hello ${user.name}`}</h1>
@@ -18,8 +21,12 @@ const Layout = ({ children }) => {
             </>
           ) : (
             <>
-              <Link href="/auth/login">Login</Link>
-              <Link href="/auth/register">Register</Link>
+              <Link href="/auth/login">
+                <a>Login</a>
+              </Link>
+              <Link href="/auth/register">
+                <a>Register</a>
+              </Link>
             </>
           )}
         </div>
