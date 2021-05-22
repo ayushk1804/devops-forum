@@ -7,10 +7,13 @@ import { ThreadList } from "../src/Components/Threads/ThreadList";
 
 const GetThreads = gql`
   query GetThreads {
-    threads(order_by: { posts_aggregate: { max: { created_at: desc } } }) {
+    threads(
+      order_by: { pinned: desc, posts_aggregate: { max: { created_at: desc } } }
+    ) {
       id
       locked
       answered
+      pinned
       title
       author {
         name
@@ -38,15 +41,11 @@ const GetThreads = gql`
 
 const IndexPage = ({ initialData }) => {
   const hasuraClient = hasuraUserClient();
-  const { data, isValidating } = useSWR(
-    GetThreads,
-    (query) => hasuraClient.request(query),
-    {
-      initialData,
-      refreshInterval: 1000,
-      revalidateOnMount: true,
-    }
-  );
+  const { data } = useSWR(GetThreads, (query) => hasuraClient.request(query), {
+    initialData,
+    refreshInterval: 1000,
+    revalidateOnMount: true,
+  });
   return (
     <div className="">
       <p className="text-red-500">Welcome to Forum!</p>

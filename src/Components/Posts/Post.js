@@ -28,7 +28,7 @@ const Post = ({ post }) => {
           </Link>
           <p className="text-sm">{post.message}</p>
           <div className="inline-flex space-x-3">
-            <span className="align-middle text-sm">{timeago}</span>
+            <span className="align-middle text-sm text-gray-600">{timeago}</span>
           </div>
         </div>
       </div>

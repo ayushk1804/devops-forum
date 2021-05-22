@@ -6,6 +6,7 @@ import { Layout } from "../../src/Components/Layout/Layout";
 
 import { PostList } from "../../src/Components/Posts/PostList";
 import { PostForm } from "../../src/Components/Posts/PostForm";
+import { useAuthState } from "../../src/Context/auth";
 
 const GetThreadIds = gql`
   query GetThreadIds {
@@ -47,9 +48,10 @@ const AddPostReply = gql`
 `;
 
 const ThreadPage = ({ initialData }) => {
+  const { isAuthenticated } = useAuthState();
   const hasuraClient = hasuraUserClient();
   const router = useRouter();
-  const { id } = router.query;
+  const { id, isfallback } = router.query;
   const { data, mutate } = useSWR(
     [GetThreadsById, id],
     (query, id) => hasuraClient.request(query, { id }),
@@ -59,7 +61,7 @@ const ThreadPage = ({ initialData }) => {
       revalidateOnMount: true,
     }
   );
-  const handlePostReply = async ({ postMessage }) => {
+  const handlePostReply = async ({ postMessage }, { target }) => {
     try {
       const hasuraClient = hasuraUserClient();
       const { insert_posts_one } = await hasuraClient.request(AddPostReply, {
@@ -73,16 +75,24 @@ const ThreadPage = ({ initialData }) => {
           posts: [...data.threads_by_pk.posts, insert_posts_one],
         },
       });
+      target.reset();
     } catch (err) {
       console.log(err);
     }
   };
+
+  if (!isfallback && !data) {
+    return <p>No Such Thread Found</p>;
+  }
+
   return (
     <>
       <h1 className="text-2xl font-semibold">{data.threads_by_pk.title}</h1>
       <div className="p-6 space-y-10">
         <PostList posts={data.threads_by_pk.posts} />
-        {!data.threads_by_pk.locked && <PostForm onSubmit={handlePostReply} />}
+        {!data.threads_by_pk.locked && isAuthenticated && (
+          <PostForm onSubmit={handlePostReply} />
+        )}
       </div>
     </>
   );
