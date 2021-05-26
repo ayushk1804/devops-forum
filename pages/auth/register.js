@@ -83,7 +83,3 @@ export default function RegistrationPage() {
 }
 
 RegistrationPage.layout = Layout;
-
-// 2. Post request to API /api/auth/register
-// 3. If error return the error
-// 4. If successful return home
