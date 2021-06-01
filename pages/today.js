@@ -44,7 +44,7 @@ const GetThreads = gql`
 `;
 
 const IndexPage = ({ initialData, from, to }) => {
-  const hasuraClient = hasuraUserClient();
+  const [hasuraClient] = hasuraUserClient();
   const { data } = useSWR(
     GetThreads,
     (query) => hasuraClient.request(query, { from, to }),
@@ -63,7 +63,7 @@ const IndexPage = ({ initialData, from, to }) => {
 };
 
 export const getStaticProps = async () => {
-  const hasuraClient = hasuraUserClient();
+  const [hasuraClient] = hasuraUserClient();
   const initialData = await hasuraClient.request(GetThreads, { from, to });
   return {
     props: {

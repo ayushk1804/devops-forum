@@ -7,6 +7,7 @@ import { Layout } from "../../src/Components/Layout/Layout";
 import { PostList } from "../../src/Components/Posts/PostList";
 import { PostForm } from "../../src/Components/Posts/PostForm";
 import { useAuthState } from "../../src/Context/auth";
+import { useEffect } from "react";
 
 const GetThreadIds = gql`
   query GetThreadIds {
@@ -29,6 +30,14 @@ const GetThreadsById = gql`
           id
           name
         }
+        # likes {
+        #   id
+        # }
+        like_aggregate {
+          aggregate {
+            count
+          }
+        }
       }
     }
   }
@@ -47,9 +56,39 @@ const AddPostReply = gql`
   }
 `;
 
+const InsertLikeById = gql`
+  mutation InsertLike($postId: uuid!) {
+    insert_likes_one(object: { post_id: $postId }) {
+      id
+    }
+  }
+`;
+const DeleteLikeById = gql`
+  mutation DeleteLike($id: uuid!) {
+    delete_likes_by_pk(id: $id) {
+      id
+    }
+  }
+`;
+
+const GetUserLikedPosts = gql`
+  query getUserLikes($threadId: uuid!, $userId: uuid!) {
+    likes(
+      where: {
+        post: { thread_id: { _eq: $threadId } }
+        user_id: { _eq: $userId }
+      }
+    ) {
+      post_id
+      user_id
+      id
+    }
+  }
+`;
+
 const ThreadPage = ({ initialData }) => {
   const { isAuthenticated } = useAuthState();
-  const hasuraClient = hasuraUserClient();
+  const [hasuraClient, userId] = hasuraUserClient();
   const router = useRouter();
   const { id, isfallback } = router.query;
   const { data, mutate } = useSWR(
@@ -61,9 +100,21 @@ const ThreadPage = ({ initialData }) => {
       revalidateOnMount: true,
     }
   );
+  const inituser = null;
+  const { userLikesData } = useSWR(
+    [GetUserLikedPosts, id, userId],
+    (query, id, userId) => hasuraClient.request(query, { id, userId }),
+    {
+      initialData: inituser,
+      refreshInterval: 1000,
+      revalidateOnMount: true,
+    }
+  );
+
+  useEffect(() => console.log(userLikesData), [userLikesData]);
+
   const handlePostReply = async ({ postMessage }, { target }) => {
     try {
-      const hasuraClient = hasuraUserClient();
       const { insert_posts_one } = await hasuraClient.request(AddPostReply, {
         ThreadId: id,
         postMessage,
@@ -81,6 +132,31 @@ const ThreadPage = ({ initialData }) => {
     }
   };
 
+  const handlePostLike = async ({ postId }) => {
+    console.log("liked");
+    try {
+      const { insert_likes_one } = await hasuraClient.request(InsertLikeById, {
+        postId,
+      });
+      console.log(insert_likes_one);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handlePostUnlike = async ({ likeId }) => {
+    console.log("unliked");
+    try {
+      const { delete_likes_by_pk } = await hasuraClient.request(
+        DeleteLikeById,
+        { id: likeId }
+      );
+      console.log(delete_likes_by_pk);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   if (!isfallback && !data) {
     return <p>No Such Thread Found</p>;
   }
@@ -89,7 +165,10 @@ const ThreadPage = ({ initialData }) => {
     <>
       <h1 className="text-2xl font-semibold">{data.threads_by_pk.title}</h1>
       <div className="p-6 space-y-10">
-        <PostList posts={data.threads_by_pk.posts} />
+        <PostList
+          posts={data.threads_by_pk.posts}
+          actions={{ handlePostLike, handlePostUnlike }}
+        />
         {!data.threads_by_pk.locked && isAuthenticated && (
           <PostForm onSubmit={handlePostReply} />
         )}
@@ -99,7 +178,7 @@ const ThreadPage = ({ initialData }) => {
 };
 
 const getStaticPaths = async () => {
-  const hasuraClient = hasuraUserClient();
+  const [hasuraClient] = hasuraUserClient();
   const { threads } = await hasuraClient.request(GetThreadIds);
   return {
     paths: threads.map(({ id }) => ({
@@ -113,7 +192,7 @@ const getStaticPaths = async () => {
 
 const getStaticProps = async ({ params }) => {
   const { id } = params;
-  const hasuraClient = hasuraUserClient();
+  const [hasuraClient] = hasuraUserClient();
   const initialData = await hasuraClient.request(GetThreadsById, { id });
   return {
     props: {

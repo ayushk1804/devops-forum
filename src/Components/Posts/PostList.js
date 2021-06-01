@@ -1,5 +1,5 @@
 import { Post } from "./Post";
-const PostList = ({ posts }) => {
+const PostList = ({ posts, actions }) => {
   if (!posts) {
     return null;
   }
@@ -7,7 +7,7 @@ const PostList = ({ posts }) => {
   return (
     <div className="divide-y">
       {posts.map((post, key) => (
-        <Post key={key} post={post} />
+        <Post key={key} post={post} actions={actions} />
       ))}
     </div>
   );

@@ -1,10 +1,10 @@
-import Link from "next/link";
-
 import formatRelative from "date-fns/formatRelative";
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
+import { Reactions } from "./Reactions";
 
-const today = new Date();
-const Post = ({ post }) => {
+const Post = ({ post, actions }) => {
+  const today = new Date();
   const timeago = formatRelative(Date.parse(post.created_at), today, {
     weekStartsOn: 1,
   });
@@ -28,14 +28,19 @@ const Post = ({ post }) => {
               <h3 className="text-xl font-semibold">{post.author.name}</h3>
             </a>
           </Link>
-          <p className="text-sm">
+          <div className="text-sm">
             <ReactMarkdown children={post.message} />
-          </p>
+          </div>
           <div className="inline-flex space-x-3">
             <span className="align-middle text-sm text-gray-600">
               {timeago}
             </span>
           </div>
+          <Reactions
+            postId={post.id}
+            likes={post.like_aggregate.aggregate.count}
+            {...actions}
+          />
         </div>
       </div>
     </div>

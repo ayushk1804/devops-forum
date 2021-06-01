@@ -40,7 +40,7 @@ const GetThreads = gql`
 `;
 
 const IndexPage = ({ initialData }) => {
-  const hasuraClient = hasuraUserClient();
+  const [hasuraClient] = hasuraUserClient();
   const { data } = useSWR(GetThreads, (query) => hasuraClient.request(query), {
     initialData,
     refreshInterval: 1000,
@@ -55,7 +55,7 @@ const IndexPage = ({ initialData }) => {
 };
 
 export const getStaticProps = async () => {
-  const hasuraClient = hasuraUserClient();
+  const [hasuraClient] = hasuraUserClient();
   const initialData = await hasuraClient.request(GetThreads);
   return { props: { initialData }, revalidate: 1 };
 };
