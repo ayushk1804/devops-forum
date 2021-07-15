@@ -9,13 +9,10 @@ const hasuraUserClient = () => {
     userId = user?.user.id;
   }
 
-  return [
-    new GraphQLClient(process.env.NEXT_PUBLIC_HASURA_API_ENDPOINT, {
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    }),
-    userId,
-  ];
+  return new GraphQLClient(process.env.NEXT_PUBLIC_HASURA_API_ENDPOINT, {
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
 };
 export { hasuraUserClient, gql };

@@ -30,8 +30,9 @@ const GetThreadsById = gql`
           id
           name
         }
-        # likes {
+        # like {
         #   id
+        #   user_id
         # }
         like_aggregate {
           aggregate {
@@ -88,7 +89,7 @@ const GetUserLikedPosts = gql`
 
 const ThreadPage = ({ initialData }) => {
   const { isAuthenticated } = useAuthState();
-  const [hasuraClient, userId] = hasuraUserClient();
+  const hasuraClient = hasuraUserClient();
   const router = useRouter();
   const { id, isfallback } = router.query;
   const { data, mutate } = useSWR(
@@ -100,18 +101,18 @@ const ThreadPage = ({ initialData }) => {
       revalidateOnMount: true,
     }
   );
-  const inituser = null;
-  const { userLikesData } = useSWR(
-    [GetUserLikedPosts, id, userId],
-    (query, id, userId) => hasuraClient.request(query, { id, userId }),
-    {
-      initialData: inituser,
-      refreshInterval: 1000,
-      revalidateOnMount: true,
-    }
-  );
+  // const inituser = null;
+  // const { userLikesData } = useSWR(
+  //   [GetUserLikedPosts, id, userId],
+  //   (query, id, userId) => hasuraClient.request(query, { id, userId }),
+  //   {
+  //     initialData: inituser,
+  //     refreshInterval: 1000,
+  //     revalidateOnMount: true,
+  //   }
+  // );
 
-  useEffect(() => console.log(userLikesData), [userLikesData]);
+  // useEffect(() => console.log(userLikesData), [userLikesData]);
 
   const handlePostReply = async ({ postMessage }, { target }) => {
     try {
@@ -178,7 +179,7 @@ const ThreadPage = ({ initialData }) => {
 };
 
 const getStaticPaths = async () => {
-  const [hasuraClient] = hasuraUserClient();
+  const hasuraClient = hasuraUserClient();
   const { threads } = await hasuraClient.request(GetThreadIds);
   return {
     paths: threads.map(({ id }) => ({
@@ -192,7 +193,7 @@ const getStaticPaths = async () => {
 
 const getStaticProps = async ({ params }) => {
   const { id } = params;
-  const [hasuraClient] = hasuraUserClient();
+  const hasuraClient = hasuraUserClient();
   const initialData = await hasuraClient.request(GetThreadsById, { id });
   return {
     props: {

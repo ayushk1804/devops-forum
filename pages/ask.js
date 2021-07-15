@@ -63,7 +63,7 @@ const AskPage = ({ categories }) => {
 
   const onSubmit = async ({ categoryId, postTitle, postMessage }) => {
     console.log("posting");
-    const [hasuraClient] = hasuraUserClient();
+    const hasuraClient = hasuraUserClient();
     try {
       const { insert_threads_one } = await hasuraClient.request(InsertThread, {
         categoryId,

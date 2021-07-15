@@ -51,7 +51,7 @@ const GetCategoryById = gql`
 `;
 
 const CategoryPage = ({ initialData }) => {
-  const [hasuraClient] = hasuraUserClient();
+  const hasuraClient = hasuraUserClient();
   const router = useRouter();
   const { id, isfallback } = router.query;
   const { data, mutate } = useSWR(
@@ -79,7 +79,7 @@ const CategoryPage = ({ initialData }) => {
 };
 
 const getStaticPaths = async () => {
-  const [hasuraClient] = hasuraUserClient();
+  const hasuraClient = hasuraUserClient();
   const { categories } = await hasuraClient.request(GetCategoryIds);
   return {
     paths: categories.map(({ id }) => ({
@@ -93,7 +93,7 @@ const getStaticPaths = async () => {
 
 const getStaticProps = async ({ params }) => {
   const { id } = params;
-  const [hasuraClient] = hasuraUserClient();
+  const hasuraClient = hasuraUserClient();
   const initialData = await hasuraClient.request(GetCategoryById, { id });
   return {
     props: {
