@@ -38,7 +38,8 @@ const Post = ({ post, actions }) => {
           </div>
           <Reactions
             postId={post.id}
-            likes={post.like_aggregate.aggregate.count}
+            likes={post.likes}
+            likes_agg={post.likes_aggregate.aggregate.count}
             {...actions}
           />
         </div>

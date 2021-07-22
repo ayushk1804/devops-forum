@@ -1,7 +1,6 @@
 import { Layout } from "../src/Components/Layout/Layout";
 import { hasuraUserClient, gql } from "../src/lib/hasura-user-client";
 import useSWR from "swr";
-import { hasuraAdminClient } from "../src/lib/hasura-admin-client";
 
 import { ThreadList } from "../src/Components/Threads/ThreadList";
 

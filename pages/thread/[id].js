@@ -7,7 +7,6 @@ import { Layout } from "../../src/Components/Layout/Layout";
 import { PostList } from "../../src/Components/Posts/PostList";
 import { PostForm } from "../../src/Components/Posts/PostForm";
 import { useAuthState } from "../../src/Context/auth";
-import { useEffect } from "react";
 
 const GetThreadIds = gql`
   query GetThreadIds {
@@ -26,15 +25,16 @@ const GetThreadsById = gql`
         id
         message
         created_at
+        updated_at
         author {
           id
           name
         }
-        # like {
-        #   id
-        #   user_id
-        # }
-        like_aggregate {
+        likes {
+          id
+          user_id
+        }
+        likes_aggregate {
           aggregate {
             count
           }
@@ -101,18 +101,6 @@ const ThreadPage = ({ initialData }) => {
       revalidateOnMount: true,
     }
   );
-  // const inituser = null;
-  // const { userLikesData } = useSWR(
-  //   [GetUserLikedPosts, id, userId],
-  //   (query, id, userId) => hasuraClient.request(query, { id, userId }),
-  //   {
-  //     initialData: inituser,
-  //     refreshInterval: 1000,
-  //     revalidateOnMount: true,
-  //   }
-  // );
-
-  // useEffect(() => console.log(userLikesData), [userLikesData]);
 
   const handlePostReply = async ({ postMessage }, { target }) => {
     try {
@@ -133,7 +121,7 @@ const ThreadPage = ({ initialData }) => {
     }
   };
 
-  const handlePostLike = async ({ postId }) => {
+  const handlePostLike = async (postId) => {
     console.log("liked");
     try {
       const { insert_likes_one } = await hasuraClient.request(InsertLikeById, {
@@ -145,7 +133,7 @@ const ThreadPage = ({ initialData }) => {
     }
   };
 
-  const handlePostUnlike = async ({ likeId }) => {
+  const handlePostUnlike = async (likeId) => {
     console.log("unliked");
     try {
       const { delete_likes_by_pk } = await hasuraClient.request(
