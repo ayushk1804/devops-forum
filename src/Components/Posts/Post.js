@@ -7,6 +7,7 @@ import { PostForm } from "./PostForm";
 import { Reactions } from "./Reactions";
 
 const Post = ({ post, actions }) => {
+  const id = post.id
   const today = new Date();
   const {
     handlePostDelete,

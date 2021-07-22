@@ -4,12 +4,13 @@ import ReactMde from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";
 import ReactMarkdown from "react-markdown";
 
-const PostForm = ({ onSubmit }) => {
+const PostForm = ({ defaultValues, onSubmit }) => {
+  console.log(typeof {defaultValues})
   const {
     handleSubmit,
     control,
     formState: { isSubmitting, errors },
-  } = useForm();
+  } = useForm({defaultValues:{defaultValues}});
   const [selectedTab, setSelectedTab] = useState("write");
 
   return (
